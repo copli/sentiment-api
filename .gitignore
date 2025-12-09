@@ -1,0 +1,18 @@
+# Ambiente virtual
+.venv/
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Modelos / cache Hugging Face
+**/cache/
+**/models/
+
+# Configurações do editor
+.vscode/
+
+# Arquivos temporários
+.DS_Store
+Thumbs.db

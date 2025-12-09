@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Análise de Sentimentos de Feedbacks</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 2rem;
+      background: #0f172a;
+      color: #e5e7eb;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      background: #020617;
+      border-radius: 16px;
+      padding: 1.5rem 2rem 2rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      border: 1px solid #1f2937;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: #9ca3af;
+      margin-bottom: 1.2rem;
+    }
+
+    label {
+      font-size: 0.9rem;
+      color: #d1d5db;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 140px;
+      margin-top: 0.4rem;
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: 1px solid #374151;
+      background: #020617;
+      color: #e5e7eb;
+      resize: vertical;
+    }
+
+    textarea::placeholder {
+      color: #6b7280;
+    }
+
+    .row {
+      display: flex;
+      gap: 1rem;
+      margin-top: 0.8rem;
+      flex-wrap: wrap;
+    }
+
+    select {
+      padding: 0.5rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid #374151;
+      background: #020617;
+      color: #e5e7eb;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.4rem 0.7rem;
+      border-radius: 999px;
+      background: #111827;
+      border: 1px solid #1f2937;
+      font-size: 0.8rem;
+    }
+
+    button {
+      margin-top: 1rem;
+      padding: 0.7rem 1.4rem;
+      border-radius: 999px;
+      border: none;
+      background: #22c55e;
+      color: #022c22;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.15s;
+    }
+
+    button:hover {
+      background: #16a34a;
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px rgba(22, 163, 74, 0.4);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: default;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .results {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      border-radius: 12px;
+      background: #020617;
+      border: 1px solid #1f2937;
+    }
+
+    .results-title {
+      font-size: 0.95rem;
+      margin-bottom: 0.5rem;
+      color: #cbd5f5;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .badge-positivo {
+      background: #022c22;
+      color: #22c55e;
+      border: 1px solid #16a34a;
+    }
+
+    .badge-negativo {
+      background: #450a0a;
+      color: #fecaca;
+      border: 1px solid #ef4444;
+    }
+
+    .badge-neutro {
+      background: #020617;
+      color: #e5e7eb;
+      border: 1px solid #4b5563;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-top: 0.75rem;
+      font-size: 0.85rem;
+    }
+
+    .stat-card {
+      padding: 0.6rem 0.8rem;
+      border-radius: 10px;
+      background: #020617;
+      border: 1px solid #1f2937;
+    }
+
+    .stat-label {
+      color: #9ca3af;
+      font-size: 0.75rem;
+    }
+
+    .stat-value {
+      font-weight: 600;
+      margin-top: 0.2rem;
+    }
+
+    .item {
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid #111827;
+    }
+
+    .item-text {
+      font-size: 0.85rem;
+      color: #e5e7eb;
+      white-space: pre-wrap;
+    }
+
+    .item-meta {
+      margin-top: 0.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: #9ca3af;
+    }
+
+    .error {
+      margin-top: 0.75rem;
+      padding: 0.6rem 0.8rem;
+      border-radius: 10px;
+      background: #450a0a;
+      border: 1px solid #ef4444;
+      color: #fee2e2;
+      font-size: 0.8rem;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 1rem;
+      }
+
+      .container {
+        padding: 1.25rem 1.2rem 1.4rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>API de Análise de Sentimentos</h1>
+    <p class="subtitle">
+      Digite um ou mais feedbacks. Você pode colocar <strong>uma frase por linha</strong> para análise em lote.
+    </p>
+
+    <label for="texto">Feedback(s)</label>
+    <textarea id="texto" placeholder="Exemplo:
+O atendimento foi excelente, muito rápido.
+Demorou demais, estou insatisfeito.
+Foi ok, nada demais."></textarea>
+
+    <div class="row">
+      <div>
+        <label for="modo">Modo de classificação</label><br />
+        <select id="modo">
+          <option value="triclasse">Triclasse (positivo / neutro / negativo)</option>
+          <option value="binario">Binário (positivo / negativo)</option>
+        </select>
+      </div>
+
+      <div class="chip">
+        <input type="checkbox" id="lote" />
+        <label for="lote">Uma linha = um comentário (análise em lote)</label>
+      </div>
+    </div>
+
+    <button id="analisar">
+      🔍 Analisar sentimento
+    </button>
+
+    <div id="mensagem-erro" class="error" style="display:none;"></div>
+
+    <div class="results" id="results" style="display:none;">
+      <div class="results-title">Resultado</div>
+      <div id="resultado-conteudo"></div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "http://127.0.0.1:8000"; // ajuste se rodar em outro host/porta
+
+    const btn = document.getElementById("analisar");
+    const textarea = document.getElementById("texto");
+    const modoSelect = document.getElementById("modo");
+    const loteCheckbox = document.getElementById("lote");
+    const resultsBox = document.getElementById("results");
+    const resultadoConteudo = document.getElementById("resultado-conteudo");
+    const erroBox = document.getElementById("mensagem-erro");
+
+    function setLoading(loading) {
+      btn.disabled = loading;
+      btn.textContent = loading ? "Analisando..." : "🔍 Analisar sentimento";
+    }
+
+    function showError(msg) {
+      erroBox.style.display = "block";
+      erroBox.textContent = msg;
+    }
+
+    function clearError() {
+      erroBox.style.display = "none";
+      erroBox.textContent = "";
+    }
+
+    btn.addEventListener("click", async () => {
+      clearError();
+      resultsBox.style.display = "none";
+      resultadoConteudo.innerHTML = "";
+
+      const texto = textarea.value.trim();
+      const modo = modoSelect.value;
+      const emLote = loteCheckbox.checked;
+
+      if (!texto) {
+        showError("Digite pelo menos um feedback para analisar.");
+        return;
+      }
+
+      setLoading(true);
+
+      try {
+        if (!emLote) {
+          // Chama /sentimento
+          const resp = await fetch(`${API_BASE}/sentimento`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ texto, modo })
+          });
+
+          if (!resp.ok) {
+            const errData = await resp.json().catch(() => ({}));
+            throw new Error("Erro na API: " + (errData.detail || resp.status));
+          }
+
+          const data = await resp.json();
+          renderResultadoUnico(texto, data);
+        } else {
+          // Divide por linhas não vazias
+          const linhas = texto
+            .split("\n")
+            .map(l => l.trim())
+            .filter(l => l.length > 0);
+
+          const resp = await fetch(`${API_BASE}/sentimentos/lote`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ textos: linhas, modo })
+          });
+
+          if (!resp.ok) {
+            const errData = await resp.json().catch(() => ({}));
+            throw new Error("Erro na API: " + (errData.detail || resp.status));
+          }
+
+          const data = await resp.json();
+          renderResultadoLote(data);
+        }
+      } catch (e) {
+        console.error(e);
+        showError(e.message || "Erro ao chamar a API.");
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    function badge(label) {
+      const lower = label.toLowerCase();
+      let cls = "badge-neutro";
+      if (lower === "positivo") cls = "badge-positivo";
+      if (lower === "negativo") cls = "badge-negativo";
+      return `<span class="badge ${cls}">${label}</span>`;
+    }
+
+    function renderResultadoUnico(texto, resultado) {
+      resultsBox.style.display = "block";
+      resultadoConteudo.innerHTML = `
+        <div class="item">
+          <div class="item-text">${escapeHtml(texto)}</div>
+          <div class="item-meta">
+            <span>${badge(resultado.label)}</span>
+            <span>Confiança: ${(resultado.score * 100).toFixed(1)}%</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderResultadoLote(data) {
+      resultsBox.style.display = "block";
+
+      const estat = data.estatisticas;
+      const itens = data.resultados;
+
+      let html = `
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-label">Total</div>
+            <div class="stat-value">${estat.total}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Positivos</div>
+            <div class="stat-value">${estat.positivos} (${estat.porcent_positivos.toFixed(1)}%)</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Negativos</div>
+            <div class="stat-value">${estat.negativos} (${estat.porcent_negativos.toFixed(1)}%)</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Neutros</div>
+            <div class="stat-value">${estat.neutros} (${estat.porcent_neutros.toFixed(1)}%)</div>
+          </div>
+        </div>
+      `;
+
+      itens.forEach(item => {
+        html += `
+          <div class="item">
+            <div class="item-text">${escapeHtml(item.texto)}</div>
+            <div class="item-meta">
+              <span>${badge(item.label)}</span>
+              <span>Confiança: ${(item.score * 100).toFixed(1)}%</span>
+            </div>
+          </div>
+        `;
+      });
+
+      resultadoConteudo.innerHTML = html;
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+  </script>
+</body>
+</html>
