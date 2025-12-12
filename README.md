@@ -245,24 +245,6 @@ Basta abrir o arquivo no navegador.
 ## 👥 Equipe
 
 Carlos Oberto Pereira Lima – Desenvolvedor Backend
-
-João Batista – Cientista de Dados
-
-Gabriela Duarte do Nascimento – Engenheira de Dados
-
-Everton Guedes – Desenvolvedor Backend
-
-Marcos Antonio dos Santos – Cientista de Dados
-
-Felipe Miguel – Cientista de Dados
-
-Tainah Torres – Cientista de Dados
-
-Márcio Pereira – Desenvolvedor Backend
-
-Paulo Fleury – Desenvolvedor Backend
-
-Kauê Araújo – Desenvolvedor Backend
 ---
 
 ## 📄 Licença
